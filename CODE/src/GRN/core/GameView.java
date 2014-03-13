@@ -1,10 +1,16 @@
 package GRN.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.util.Log;
 import android.view.Display;
@@ -18,10 +24,12 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	Bitmap background,ricepack;
 	public GameEngine engine;
 	private SurfaceHolder holder;
+	Paint paint;
 	int sizeX;
 	int sizeY;
 	int x = 0, y = 0, xup = 0, yup = 0;
 	int xs = 0, ys = 0;
+	ArrayList<PointLine> points;
 	
 	public GameView(GameActivity activity) {
 		super(activity);
@@ -32,7 +40,7 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 		sizeX=size.x;
 		sizeY=size.y;
 		
-		engine = new GameEngine(Level.EASY, size.x, size.y, this);
+		engine = new GameEngine(Level.HARD, 3, size.x, size.y, this);
 		
 		background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
 		ricepack = BitmapFactory.decodeResource(getResources(), R.drawable.ricepack);
@@ -42,6 +50,13 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
   	  	holder = getHolder();
 
         holder.addCallback(this); 
+        
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(4);
+        paint.setColor(Color.WHITE);
+        
+        points = new ArrayList<PointLine>();
 	}
 
 	@SuppressLint("WrongCall")
@@ -69,7 +84,6 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	
 	protected void onDraw(Canvas canvas) 
     {
-		Log.e("draw","onDraw");
 		canvas.drawBitmap(background, 0, 0, null);
 		
 		int dec = ricepack.getWidth()/2;
@@ -77,17 +91,65 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 		for(int i=0; i<pos.length; i++){
 			canvas.drawBitmap(ricepack, (float)pos[i][0]-dec, (float)pos[i][1]-dec, null);
 		}
+		
+		Path path = new Path();
+
+	    if(points.size() > 1){
+	        for(int i = points.size() - 2; i < points.size(); i++){
+	            if(i >= 0){
+	                PointLine point = points.get(i);
+
+	                if(i == 0){
+	                    PointLine next = points.get(i + 1);
+	                    point.dx = ((next.x - point.x) / 3);
+	                    point.dy = ((next.y - point.y) / 3);
+	                }
+	                else if(i == points.size() - 1){
+	                    PointLine prev = points.get(i - 1);
+	                    point.dx = ((point.x - prev.x) / 3);
+	                    point.dy = ((point.y - prev.y) / 3);
+	                }
+	                else{
+	                    PointLine next = points.get(i + 1);
+	                    PointLine prev = points.get(i - 1);
+	                    point.dx = ((next.x - prev.x) / 3);
+	                    point.dy = ((next.y - prev.y) / 3);
+	                }
+	            }
+	        }
+	    }
+
+	    boolean first = true;
+	    for(int i = 0; i < points.size(); i++){
+	        PointLine point = points.get(i);
+	        if(first){
+	            first = false;
+	            path.moveTo(point.x, point.y);
+	        }
+	        else{
+	            PointLine prev = points.get(i - 1);
+	            path.cubicTo(prev.x + prev.dx, prev.y + prev.dy, point.x - point.dx, point.y - point.dy, point.x, point.y);
+	        }
+	    }
+	    canvas.drawPath(path, paint);
     }
 	
 	public boolean onTouchEvent(MotionEvent event) {
 		
 	  	if(event.getAction()==MotionEvent.ACTION_DOWN)
 	  	{
+	  		points.removeAll(points);
 	  		int dec = ricepack.getWidth()/2;
 			xup = 0;
 			x = (int)event.getX();
 			y = (int)event.getY();
 			engine.setDownPosition(x, y);
+			
+			PointLine point = new PointLine();
+	        point.x = (int)event.getX();
+	        point.y = (int)event.getY();
+	        points.add(point);
+	        invalidate();
 	  	}
 	  	
 	  	if(event.getAction()==MotionEvent.ACTION_UP)
@@ -95,12 +157,36 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	  		int dec = ricepack.getWidth()/2;
 
 			int pos[][] = engine.getDrawPos();
-			xs = pos[0][0]-dec;
-			ys = pos[0][1]-dec;
 			
 			xup = (int)event.getX();
 			yup = (int)event.getY();
 			engine.setUpPosition(xup, yup, dec);
+			
+			PointLine point = new PointLine();
+	        point.x = (int)event.getX();
+	        point.y = (int)event.getY();
+	        points.add(point);
+	        invalidate();
+	  	}
+	  	
+	  	if(event.getAction()==MotionEvent.ACTION_MOVE)
+	  	{
+	  		int dec = ricepack.getWidth()/2;
+	  		int pos[][] = engine.getDrawPos();
+			
+			xup = (int)event.getX();
+			yup = (int)event.getY();
+			engine.setUpPosition(xup, yup, dec);
+			
+	  		if(points.size()>15)
+	  		{
+	  			points.remove(0);
+	  		}
+			PointLine point = new PointLine();
+	        point.x = (int)event.getX();
+	        point.y = (int)event.getY();
+	        points.add(point);
+	        invalidate();
 	  	}
   		return true;
 	}
@@ -122,5 +208,23 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			int height) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	class PointLine extends Point{
+	    float x, y;
+	    float dx, dy;
+
+	    @Override
+	    public String toString() {
+	        return x + ", " + y;
+	    }
+	}
+
+	@Override
+	public void gameOver(int score) {
+		// TODO Auto-generated method stub
+		Canvas canvas;
+		canvas = null;
+		canvas.drawText("GAMEOVER OVER", sizeX/2, sizeY/2, null);
 	}
 }

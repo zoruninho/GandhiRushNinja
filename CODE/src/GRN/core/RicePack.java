@@ -1,9 +1,9 @@
 package GRN.core;
-
 import java.util.Random;
 
 
 public class RicePack {
+	private PackType type;
 	private float step = 0,
 			byStep;
 	private int		dir=0, //0= g->d, 1=d->g
@@ -18,6 +18,8 @@ public class RicePack {
 	
 	public RicePack(int Xmin, int Xmax, int Ymin, int Ymax, int byStep){
 		Random rand = new Random();
+		
+		type = PackType.getType(rand.nextInt(2));
 		
 		//racine inférieure dans la première partie de la zone 
 		min = Xmin+rand.nextInt((Xmax-Xmin)/2);
@@ -52,6 +54,10 @@ public class RicePack {
 		else
 			return (int)(max-step);
 		
+	}
+	
+	public PackType getType(){
+		return type;
 	}
 	
 	public void nextStep(){
