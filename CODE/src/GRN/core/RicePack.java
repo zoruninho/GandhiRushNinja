@@ -15,19 +15,21 @@ public class RicePack {
 			b = 1,
 			top = 1;
 	
-	
-	public RicePack(int Xmin, int Xmax, int Ymin, int Ymax, int byStep){
+	public RicePack(int Xmin, int Xmax, int Ymin, int Ymax, Mode mode){
 		Random rand = new Random();
-		
-		type = PackType.getType(rand.nextInt(2));
+		float f = rand.nextFloat();
+		if(f <= mode.getRiceRate())
+			type = PackType.RICE;
+		else
+			type = PackType.MOUSSA;
 		
 		//racine inférieure dans la première partie de la zone 
 		min = Xmin+rand.nextInt((Xmax-Xmin)/2);
 		//racine supérieure dans la seconde partie de la zone
 		max = Xmax-rand.nextInt((Xmax-Xmin)/2);
-		if(max-min < 200){
-			max+=100;
-			min-=100;
+		if(max-min < (Xmax-Xmin)/4){
+			max+=(Xmax-Xmin)/8;
+			min-=(Xmax-Xmin)/8;
 		}
 		//maximum de la parabole de base
 		top = function((min+max)/2);
@@ -37,7 +39,7 @@ public class RicePack {
 		dir = rand.nextInt(2);
 		
 		//this.byStep = byStep;
-		this.byStep = 1.0f*(max-min)/500;
+		this.byStep = 1.0f*(max-min)/mode.getStepRate();
 	}
 	
 	public int getYpos(){

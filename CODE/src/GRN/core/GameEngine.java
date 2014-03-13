@@ -5,16 +5,18 @@ import java.util.ArrayList;
 public class GameEngine extends Thread {
 	public boolean running = true;
 	private ArrayList<RicePack> pack;
-	private final int XSIZE, YSIZE, STEP = 1; 
+	private final int XSIZE, YSIZE;
+	private final float OPEN = 0.5f; 
 	private GameDisplay view;
 	private int x, y;
-	private Level level;
 	private long time;
 	private int life;
 	private int score=0;
+	private Mode mode;
 	
-	public GameEngine(Level level, int life, int Xsize, int Ysize, GameDisplay view){
-		this.level = level;
+	
+	public GameEngine(Mode mode, int life, int Xsize, int Ysize, GameDisplay view){
+		this.mode = mode;
 		this.pack = new ArrayList<RicePack>();
 		this.life = life;
 		this.XSIZE = Xsize;
@@ -25,10 +27,10 @@ public class GameEngine extends Thread {
 	public void run(){
 		this.time = System.currentTimeMillis();
 		long bufftime;
-		pack.add(new RicePack(0, XSIZE, YSIZE/2, YSIZE, STEP));
+		pack.add(new RicePack(0-(int)(XSIZE*OPEN), XSIZE+(int)(XSIZE*OPEN), YSIZE/2, YSIZE, mode));
 		while(running){
 			try {
-				this.sleep(10);
+				this.sleep(5);
 			} catch (InterruptedException e) {}
 			for(int i=0; i<pack.size(); i++){
 				pack.get(i).nextStep();
@@ -40,8 +42,8 @@ public class GameEngine extends Thread {
 			}
 			
 			bufftime=System.currentTimeMillis();
-			if(bufftime-time > level.delay()){
-				RicePack packrice = new RicePack(0, XSIZE, YSIZE/2, YSIZE, STEP); 
+			if(bufftime-time > mode.delay()){
+				RicePack packrice = new RicePack(0-(int)(XSIZE*OPEN), XSIZE+(int)(XSIZE*OPEN), YSIZE/2, YSIZE, mode); 
 				pack.add(packrice);
 				//FIXME erreur de suivi des courbes
 				//provient du pas de déplacement
@@ -79,7 +81,7 @@ public class GameEngine extends Thread {
 	 * @param xup
 	 * @param yup
 	 */
-	public void setUpPosition(int xup, int yup, int hitbox){
+	public int setUpPosition(int xup, int yup, int hitbox, int combo){
 		LinearFunction func = new LinearFunction(x, y, xup, yup);
 		int buff, funcResult, posY;
 		int pos[][] = getDrawPos();
@@ -98,13 +100,16 @@ public class GameEngine extends Thread {
 			if(buff < hitbox && between(x, pos[i][0], xup) && between(y, funcResult, yup)){
 				if(pack.get(differs).getType()==PackType.MOUSSA)
 					decreaseLife();
-				else
-					score++;
+				else{
+					score+=++combo;
+				}
 				pack.remove(differs);
 			}
 			else
 				differs++;
 		}
+		
+		return combo;
 	}
 	
 	
@@ -120,7 +125,8 @@ public class GameEngine extends Thread {
 	}
 
 	private void decreaseLife() {
-		life--;
+		if(mode != Mode.PEACE)
+			life--;
 		if(life <= 0)
 			gameOver();
 	}
