@@ -1,4 +1,4 @@
-
+package GRN.core;
 
 public interface GameDisplay {
 	

@@ -1,34 +1,51 @@
+package GRN.core;
+
+import java.util.ArrayList;
+
+import android.util.Log;
+
 
 public class GameEngine extends Thread {
 	public boolean running = true;
-	private RicePack pack[];
+	private ArrayList<RicePack> pack;
 	private final int XSIZE, YSIZE, STEP = 1; 
 	private GameDisplay view;
 	private int x, y;
+	private Level level;
+	private long time;
 	
-	public GameEngine(int nbPack, int Xsize, int Ysize, GameDisplay view){
-		pack = new RicePack[nbPack];
-		for(int i=0; i<pack.length; i++){
-			pack[i] = new RicePack(0, Xsize, Ysize/2, Ysize, STEP);
-		}
-		
+	public GameEngine(Level level, int Xsize, int Ysize, GameDisplay view){
+		this.level = level;
+		this.pack = new ArrayList<RicePack>();
 		this.XSIZE = Xsize;
 		this.YSIZE = Ysize;
 		this.view = view;
 	}
 	
 	public void run(){
-		
+		Log.e("engine", "lancement engine");
+		this.time = System.currentTimeMillis();
+		long bufftime;
+		pack.add(new RicePack(0, XSIZE, YSIZE/2, YSIZE, STEP));
 		while(running){
 			try {
 				this.sleep(5);
 			} catch (InterruptedException e) {}
-			for(int i=0; i<pack.length; i++){
-				pack[i].nextStep();
-				if(pack[i].isEnded()){
-					pack[i] = new RicePack(0, XSIZE, YSIZE/2, YSIZE, STEP);
-					System.out.println("tombé ! "+i);
+			for(int i=0; i<pack.size(); i++){
+				pack.get(i).nextStep();
+				if(pack.get(i).isEnded()){
+					pack.remove(i);
 				}
+			}
+			
+			bufftime=System.currentTimeMillis();
+			if(bufftime-time > level.delay()){
+				RicePack packrice = new RicePack(0, XSIZE, YSIZE/2, YSIZE, STEP); 
+				pack.add(packrice);
+				//FIXME erreur de suivi des courbes
+				//provient du pas de déplacement
+				
+				time = bufftime;
 			}
 			view.refreshDisplay();
 		}
@@ -36,10 +53,10 @@ public class GameEngine extends Thread {
 	}
 	
 	public int[][] getDrawPos(){
-		int values[][] = new int[pack.length][2];
-		for(int i=0; i<pack.length; i++){
-			values[i][0] = (int)pack[i].getXpos();
-			values[i][1] = YSIZE-(int)pack[i].getYpos();
+		int values[][] = new int[pack.size()][2];
+		for(int i=0; i<pack.size(); i++){
+			values[i][0] = (int)pack.get(i).getXpos();
+			values[i][1] = YSIZE-(int)pack.get(i).getYpos();
 		}
 		return values;
 	}
@@ -65,6 +82,11 @@ public class GameEngine extends Thread {
 		int buff, funcResult, posY;
 		int pos[][] = getDrawPos();
 		
+		//assure la suppression du bon élément de la liste 
+		//cad augmente a chaque itération sauf si suppression
+		//pour tenir compte du décalage de la liste après un remove()
+		int differs = 0;
+		
 		for(int i=0; i<pos.length; i++){
 			funcResult = func.function(pos[i][0]);
 			
@@ -72,8 +94,10 @@ public class GameEngine extends Thread {
 			if(buff < 0)
 				buff = -buff;
 			if(buff < hitbox && between(x, pos[i][0], xup) && between(y, funcResult, yup)){
-				pack[i] = new RicePack(0, XSIZE, YSIZE/2, YSIZE, STEP);
+				pack.remove(differs);
 			}
+			else
+				differs++;
 		}
 	}
 	

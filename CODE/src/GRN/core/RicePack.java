@@ -1,10 +1,12 @@
+package GRN.core;
+
 import java.util.Random;
 
 
 public class RicePack {
-	private int step = 0,
-			byStep,
-			dir=0, //0= g->d, 1=d->g
+	private float step = 0,
+			byStep;
+	private int		dir=0, //0= g->d, 1=d->g
 			//racine inférieure de la parabole
 			min,
 			//racine supérieure de la parabole
@@ -32,8 +34,8 @@ public class RicePack {
 		
 		dir = rand.nextInt(2);
 		
-		this.byStep = (max-min)/500;
-		
+		//this.byStep = byStep;
+		this.byStep = 1.0f*(max-min)/500;
 	}
 	
 	public int getYpos(){
@@ -46,9 +48,9 @@ public class RicePack {
 
 	public int getXpos(){
 		if(dir==0)
-			return min+step;
+			return (int)(min+step);
 		else
-			return max-step;
+			return (int)(max-step);
 		
 	}
 	
@@ -57,12 +59,16 @@ public class RicePack {
 	}
 	
 	public boolean isEnded(){
-		int pos = this.getXpos();
-		return !(min < pos & pos < max);
+		int pos = this.getYpos();
+		return (pos < 0);
 	}
 	
-	public int function(int x){
+	public int function(float x){
 		return (int)(-1.f*(x-min)*(x-max)*(1.f*b/top));
+	}
+
+	public String getFunction() {
+		return new String("-(x-"+min+")*(x-"+max+")*("+b+"/"+top+") = "+"("+1.0f*b/top+")");
 	}
 	
 }

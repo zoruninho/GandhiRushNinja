@@ -1,3 +1,4 @@
+package GRN.core;
 
 public class LinearFunction {
 	private float a = 0, b = 0;
