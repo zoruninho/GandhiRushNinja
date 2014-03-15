@@ -36,8 +36,7 @@ public class GameActivity extends Activity{
 		// Identifiant de la boîte de dialogue de défaite
 		public static final int DEFEAT_DIALOG = 1;
 	
-		// Le moteur physique du jeu
-		//private GameEngine mEngine = null;
+		MediaPlayer tunak;
 		
 		// Le moteur physique du jeu
 		private GameView mView = null;
@@ -48,7 +47,9 @@ public class GameActivity extends Activity{
 
 			mView = new GameView(this);
 			setContentView(mView);
-
+			
+			tunak = MediaPlayer.create(this, R.raw.tunak);
+			tunak.start();
 		}
 
 		/*protected void onResume() {

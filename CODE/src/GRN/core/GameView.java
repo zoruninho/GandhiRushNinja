@@ -1,7 +1,6 @@
 package GRN.core;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -12,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -21,7 +21,8 @@ import android.view.WindowManager;
 
 public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.Callback{
 
-	Bitmap background,ricepack;
+	Bitmap background,ricepack, moussaka, life, lifeLost;
+	MediaPlayer ninja;
 	public GameEngine engine;
 	private SurfaceHolder holder;
 	Paint paint, scorePaint;
@@ -30,6 +31,7 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	int x = 0, y = 0, xup = 0, yup = 0, combo = 0;
 	int xs = 0, ys = 0;
 	ArrayList<PointLine> points;
+	boolean music=true;
 	
 	public GameView(GameActivity activity) {
 		super(activity);
@@ -40,12 +42,21 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 		sizeX=size.x;
 		sizeY=size.y;
 		
-		engine = new GameEngine(Mode.PEACE, 3, size.x, size.y, this);
+		engine = new GameEngine(Mode.HARD, 3, size.x, size.y, this);
 		
 		background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
 		ricepack = BitmapFactory.decodeResource(getResources(), R.drawable.ricepack);
+		moussaka = BitmapFactory.decodeResource(getResources(), R.drawable.moussaka);
+		life = BitmapFactory.decodeResource(getResources(), R.drawable.vie_indien);
+		lifeLost = BitmapFactory.decodeResource(getResources(), R.drawable.vie_perdue);
 		
 		background=Bitmap.createScaledBitmap(background, size.x, size.y, true);
+		moussaka=Bitmap.createScaledBitmap(moussaka, ricepack.getHeight(), ricepack.getWidth(), true);
+		life=Bitmap.createScaledBitmap(life, life.getWidth()/4, life.getHeight()/4, true);
+		lifeLost=Bitmap.createScaledBitmap(lifeLost, lifeLost.getWidth()/4, lifeLost.getHeight()/4, true);
+		
+		//Ninja
+		ninja=MediaPlayer.create(activity,R.raw.ninja);
 		
   	  	holder = getHolder();
 
@@ -81,11 +92,6 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 				if (canvas != null)
 					holder.unlockCanvasAndPost(canvas);
 			}
-
-			// Pour dessiner à 50 fps
-			/*try {
-				Thread.sleep(20);
-			} catch (InterruptedException e) {}*/
 		}
 	
 	protected void onDraw(Canvas canvas) 
@@ -98,12 +104,32 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	  		}
 		}
 		canvas.drawBitmap(background, 0, 0, null);
-		canvas.drawText("YOUR SCORE : "+engine.getScore(), 4*sizeX/5, sizeY/8, scorePaint);
+		canvas.drawText("YOUR SCORE : "+engine.getScore(), 4*sizeX/5, sizeY/4, scorePaint);
+		
+		//Les vies
+		for(int i=0;i<3;i++)
+		{
+			if(i<engine.getLife())
+			{
+				canvas.drawBitmap(life, (sizeX/15)+80*i, sizeY/15, null);
+			}
+			else
+			{
+				canvas.drawBitmap(lifeLost, (sizeX/15)+80*i, sizeY/15, null);
+			}
+		}
 		
 		int dec = ricepack.getWidth()/2;
 		int pos[][] = engine.getDrawPos();
 		for(int i=0; i<pos.length; i++){
-			canvas.drawBitmap(ricepack, (float)pos[i][0]-dec, (float)pos[i][1]-dec, null);
+			if(PackType.getType(pos[i][2])==PackType.MOUSSA)
+			{
+				canvas.drawBitmap(moussaka, (float)pos[i][0]-dec, (float)pos[i][1]-dec, null);
+			}
+			else
+			{
+				canvas.drawBitmap(ricepack, (float)pos[i][0]-dec, (float)pos[i][1]-dec, null);
+			}
 		}
 		
 		Path path = new Path();
@@ -146,6 +172,10 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	        }
 	    }
 	    canvas.drawPath(path, paint);
+	    
+	    // La musique de fond
+	    
+	    
     }
 	
 	public boolean onTouchEvent(MotionEvent event) {
@@ -177,6 +207,11 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			xup = (int)event.getX();
 			yup = (int)event.getY();
 			combo = engine.setUpPosition(xup, yup, dec, combo);
+			if(combo>0)
+			{
+				Log.e("ninja","ninja");
+				ninja.start();
+			}
 			
 			PointLine point = new PointLine();
 	        point.x = (int)event.getX();
@@ -194,6 +229,11 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			xup = (int)event.getX();
 			yup = (int)event.getY();
 			combo = engine.setUpPosition(xup, yup, dec, combo);
+			if(combo>0)
+			{
+				Log.e("ninja","ninja");
+				ninja.start();
+			}
 			
 	  		if(points.size()>10)
 	  		{

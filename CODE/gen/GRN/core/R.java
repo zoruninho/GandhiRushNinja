@@ -27,6 +27,9 @@ public final class R {
         public static final int ricepack=0x7f020003;
         public static final int ricepackgold=0x7f020004;
         public static final int ricepacksilver=0x7f020005;
+        public static final int roue_param=0x7f020006;
+        public static final int vie_indien=0x7f020007;
+        public static final int vie_perdue=0x7f020008;
     }
     public static final class id {
         public static final int action_settings=0x7f090001;
@@ -40,9 +43,8 @@ public final class R {
         public static final int main=0x7f080000;
     }
     public static final class raw {
-        public static final int cointake=0x7f040000;
-        public static final int game=0x7f040001;
-        public static final int jump=0x7f040002;
+        public static final int ninja=0x7f040000;
+        public static final int tunak=0x7f040001;
     }
     public static final class string {
         public static final int action_settings=0x7f060001;

@@ -14,7 +14,6 @@ public class GameEngine extends Thread {
 	private int score=0;
 	private Mode mode;
 	
-	
 	public GameEngine(Mode mode, int life, int Xsize, int Ysize, GameDisplay view){
 		this.mode = mode;
 		this.pack = new ArrayList<RicePack>();
@@ -102,6 +101,7 @@ public class GameEngine extends Thread {
 					decreaseLife();
 				else{
 					score+=++combo;
+					
 				}
 				pack.remove(differs);
 			}
