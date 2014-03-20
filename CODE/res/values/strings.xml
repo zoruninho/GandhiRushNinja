@@ -3,6 +3,7 @@
 
     <string name="app_name">GandhiRushNinja</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="btn_newgame">New Game</string>
+	<string name="btn_exit">Exit</string>
 
 </resources>

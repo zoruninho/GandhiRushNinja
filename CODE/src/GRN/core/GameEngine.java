@@ -1,62 +1,76 @@
 package GRN.core;
-
 import java.util.ArrayList;
-
-import android.util.Log;
+import java.util.Random;
 
 
 public class GameEngine extends Thread {
 	public boolean running = true;
 	private ArrayList<RicePack> pack;
-	private final int XSIZE, YSIZE, STEP = 1; 
+	private final int XSIZE, YSIZE, DEC;
+	private final float OPEN = 0.5f; 
 	private GameDisplay view;
 	private int x, y;
-	private Level level;
 	private long time;
+	private int life;
+	private int score=0;
+	private Mode mode;
+	private boolean pause = false;
 	
-	public GameEngine(Level level, int Xsize, int Ysize, GameDisplay view){
-		this.level = level;
+	
+	public GameEngine(Mode mode, int life, int Xsize, int Ysize, GameDisplay view, int dec){
+		this.mode = mode;
+		this.DEC = dec;
 		this.pack = new ArrayList<RicePack>();
+		this.life = life;
 		this.XSIZE = Xsize;
 		this.YSIZE = Ysize;
 		this.view = view;
 	}
 	
 	public void run(){
-		Log.e("engine", "lancement engine");
+		int w;
+		int buffscore = 0;
 		this.time = System.currentTimeMillis();
 		long bufftime;
-		pack.add(new RicePack(0, XSIZE, YSIZE/2, YSIZE, STEP));
+		pack.add(new RicePack(0-(int)(XSIZE*OPEN), XSIZE+(int)(XSIZE*OPEN), YSIZE/2, YSIZE, mode));
 		while(running){
 			try {
 				this.sleep(5);
 			} catch (InterruptedException e) {}
+			
+			while(pause){
+				Random rand = new Random();
+				w = rand.nextInt();
+			}
+
 			for(int i=0; i<pack.size(); i++){
 				pack.get(i).nextStep();
-				if(pack.get(i).isEnded()){
+				if(pack.get(i).isEnded(this.XSIZE, DEC)){
+					if(pack.get(i).getType()==PackType.RICE)
+						decreaseLife();
 					pack.remove(i);
 				}
 			}
 			
 			bufftime=System.currentTimeMillis();
-			if(bufftime-time > level.delay()){
-				RicePack packrice = new RicePack(0, XSIZE, YSIZE/2, YSIZE, STEP); 
-				pack.add(packrice);
-				//FIXME erreur de suivi des courbes
-				//provient du pas de déplacement
-				
+			if(bufftime-time > mode.delay()){
+				RicePack packrice = new RicePack(0-(int)(XSIZE*OPEN), XSIZE+(int)(XSIZE*OPEN), YSIZE/2, YSIZE, mode); 
+				pack.add(packrice);				
 				time = bufftime;
 			}
+			if(buffscore+10 < score)
+				mode.increment();
 			view.refreshDisplay();
 		}
 
 	}
 	
 	public int[][] getDrawPos(){
-		int values[][] = new int[pack.size()][2];
+		int values[][] = new int[pack.size()][3];
 		for(int i=0; i<pack.size(); i++){
 			values[i][0] = (int)pack.get(i).getXpos();
 			values[i][1] = YSIZE-(int)pack.get(i).getYpos();
+			values[i][2] = pack.get(i).getType().getValue();
 		}
 		return values;
 	}
@@ -77,7 +91,7 @@ public class GameEngine extends Thread {
 	 * @param xup
 	 * @param yup
 	 */
-	public void setUpPosition(int xup, int yup, int hitbox){
+	public int setUpPosition(int xup, int yup, int combo){
 		LinearFunction func = new LinearFunction(x, y, xup, yup);
 		int buff, funcResult, posY;
 		int pos[][] = getDrawPos();
@@ -93,13 +107,22 @@ public class GameEngine extends Thread {
 			buff = pos[i][1]-funcResult;
 			if(buff < 0)
 				buff = -buff;
-			if(buff < hitbox && between(x, pos[i][0], xup) && between(y, funcResult, yup)){
+			if(buff < DEC && between(x, pos[i][0], xup) && between(y, funcResult, yup)){
+				if(pack.get(differs).getType()==PackType.MOUSSA)
+					decreaseLife();
+				else{
+					score+=++combo;
+				}
 				pack.remove(differs);
 			}
 			else
 				differs++;
 		}
+		
+		return combo;
 	}
+	
+	
 	
 	public boolean between(int min, int val, int max){
 		if(max < min){
@@ -109,6 +132,33 @@ public class GameEngine extends Thread {
 		}
 		
 		return (min <= val && val <= max);
+	}
+
+	private void decreaseLife() {
+		if(mode != Mode.PEACE)
+			life--;
+		if(life <= 0)
+			gameOver();
+	}
+
+	private void gameOver() {
+		this.running = false;
+		view.gameOver(score);
+	}
+	
+	public int getScore(){
+		return score;
+	}
+	public int getLife(){
+		return life;
+	}
+	
+	public void onPause(){
+		pause = true;
+	}
+	
+	public void onResume(){
+		pause = false;
 	}
 
 }

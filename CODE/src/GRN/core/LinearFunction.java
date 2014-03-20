@@ -11,5 +11,9 @@ public class LinearFunction {
 	public int function(int x){
 		return (int) (a*x+b);
 	}
+	
+	public int recip(int y){
+		return (int)((y-b)/a);
+	}
 
 }
