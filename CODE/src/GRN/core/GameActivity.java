@@ -1,34 +1,12 @@
 package GRN.core;
 
-import java.util.List;
-
-import GRN.core.R;
-import GRN.core.R.drawable;
-import GRN.core.R.menu;
-import GRN.core.R.raw;
-
-import android.media.MediaPlayer;
-import android.os.Bundle;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Paint.Align;
-import android.view.Display;
-import android.view.Menu;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.Window;
-import android.view.WindowManager;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.Bundle;
 
 public class GameActivity extends Activity{
 		// Identifiant de la boîte de dialogue de victoire
@@ -44,8 +22,10 @@ public class GameActivity extends Activity{
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
+			Intent intent = getIntent();
+			Bundle extras = intent.getExtras();  
 
-			mView = new GameView(this);
+			mView = new GameView(this, extras.get("difficulty").toString());
 			setContentView(mView);
 			
 			tunak = MediaPlayer.create(this, R.raw.tunak);

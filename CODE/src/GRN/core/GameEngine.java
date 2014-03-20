@@ -1,11 +1,12 @@
 package GRN.core;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class GameEngine extends Thread {
 	public boolean running = true;
 	private ArrayList<RicePack> pack;
-	private final int XSIZE, YSIZE;
+	private final int XSIZE, YSIZE, DEC;
 	private final float OPEN = 0.5f; 
 	private GameDisplay view;
 	private int x, y;
@@ -13,9 +14,12 @@ public class GameEngine extends Thread {
 	private int life;
 	private int score=0;
 	private Mode mode;
+	private boolean pause = false;
 	
-	public GameEngine(Mode mode, int life, int Xsize, int Ysize, GameDisplay view){
+	
+	public GameEngine(Mode mode, int life, int Xsize, int Ysize, GameDisplay view, int dec){
 		this.mode = mode;
+		this.DEC = dec;
 		this.pack = new ArrayList<RicePack>();
 		this.life = life;
 		this.XSIZE = Xsize;
@@ -24,6 +28,8 @@ public class GameEngine extends Thread {
 	}
 	
 	public void run(){
+		int w;
+		int buffscore = 0;
 		this.time = System.currentTimeMillis();
 		long bufftime;
 		pack.add(new RicePack(0-(int)(XSIZE*OPEN), XSIZE+(int)(XSIZE*OPEN), YSIZE/2, YSIZE, mode));
@@ -31,9 +37,15 @@ public class GameEngine extends Thread {
 			try {
 				this.sleep(5);
 			} catch (InterruptedException e) {}
+			
+			while(pause){
+				Random rand = new Random();
+				w = rand.nextInt();
+			}
+
 			for(int i=0; i<pack.size(); i++){
 				pack.get(i).nextStep();
-				if(pack.get(i).isEnded()){
+				if(pack.get(i).isEnded(this.XSIZE, DEC)){
 					if(pack.get(i).getType()==PackType.RICE)
 						decreaseLife();
 					pack.remove(i);
@@ -43,12 +55,11 @@ public class GameEngine extends Thread {
 			bufftime=System.currentTimeMillis();
 			if(bufftime-time > mode.delay()){
 				RicePack packrice = new RicePack(0-(int)(XSIZE*OPEN), XSIZE+(int)(XSIZE*OPEN), YSIZE/2, YSIZE, mode); 
-				pack.add(packrice);
-				//FIXME erreur de suivi des courbes
-				//provient du pas de déplacement
-				
+				pack.add(packrice);				
 				time = bufftime;
 			}
+			if(buffscore+10 < score)
+				mode.increment();
 			view.refreshDisplay();
 		}
 
@@ -80,7 +91,7 @@ public class GameEngine extends Thread {
 	 * @param xup
 	 * @param yup
 	 */
-	public int setUpPosition(int xup, int yup, int hitbox, int combo){
+	public int setUpPosition(int xup, int yup, int combo){
 		LinearFunction func = new LinearFunction(x, y, xup, yup);
 		int buff, funcResult, posY;
 		int pos[][] = getDrawPos();
@@ -96,12 +107,11 @@ public class GameEngine extends Thread {
 			buff = pos[i][1]-funcResult;
 			if(buff < 0)
 				buff = -buff;
-			if(buff < hitbox && between(x, pos[i][0], xup) && between(y, funcResult, yup)){
+			if(buff < DEC && between(x, pos[i][0], xup) && between(y, funcResult, yup)){
 				if(pack.get(differs).getType()==PackType.MOUSSA)
 					decreaseLife();
 				else{
 					score+=++combo;
-					
 				}
 				pack.remove(differs);
 			}
@@ -141,6 +151,14 @@ public class GameEngine extends Thread {
 	}
 	public int getLife(){
 		return life;
+	}
+	
+	public void onPause(){
+		pause = true;
+	}
+	
+	public void onResume(){
+		pause = false;
 	}
 
 }

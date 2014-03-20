@@ -66,9 +66,10 @@ public class RicePack {
 		step+=byStep;
 	}
 	
-	public boolean isEnded(){
-		int pos = this.getYpos();
-		return (pos < 0);
+	public boolean isEnded(int width, int dec){
+		int y = this.getYpos();
+		int x = this.getXpos();
+		return (y < 0 || (dir == 1 && x < -dec) || (dir == 0 && width < x-dec));
 	}
 	
 	public int function(float x){

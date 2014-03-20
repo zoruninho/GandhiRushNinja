@@ -18,6 +18,7 @@ public enum Mode {
 	private int launchDelay;
 	private float riceRate;
 	private int stepRate;
+
 	
 	Mode(float f, int delay, int step){
 		riceRate = f;
@@ -34,5 +35,12 @@ public enum Mode {
 	
 	public int getStepRate(){
 		return stepRate;
+	}
+	
+	public void increment(){
+		launchDelay-=100;
+		
+		if(riceRate > 0)
+			riceRate-=0.02f;
 	}
 }

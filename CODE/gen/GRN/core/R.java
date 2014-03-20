@@ -32,11 +32,13 @@ public final class R {
         public static final int vie_perdue=0x7f020008;
     }
     public static final class id {
-        public static final int action_settings=0x7f090001;
-        public static final int dismiss=0x7f090000;
+        public static final int action_settings=0x7f090003;
+        public static final int bExit=0x7f090001;
+        public static final int bNew=0x7f090000;
+        public static final int dismiss=0x7f090002;
     }
     public static final class layout {
-        public static final int activity_main=0x7f030000;
+        public static final int main=0x7f030000;
         public static final int popup=0x7f030001;
     }
     public static final class menu {
@@ -49,7 +51,8 @@ public final class R {
     public static final class string {
         public static final int action_settings=0x7f060001;
         public static final int app_name=0x7f060000;
-        public static final int hello_world=0x7f060002;
+        public static final int btn_exit=0x7f060003;
+        public static final int btn_newgame=0x7f060002;
     }
     public static final class style {
         /** 

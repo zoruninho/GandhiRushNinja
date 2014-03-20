@@ -33,7 +33,7 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	ArrayList<PointLine> points;
 	boolean music=true;
 	
-	public GameView(GameActivity activity) {
+	public GameView(GameActivity activity, String difficulty) {
 		super(activity);
 		WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
@@ -41,8 +41,6 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 		display.getSize(size);
 		sizeX=size.x;
 		sizeY=size.y;
-		
-		engine = new GameEngine(Mode.HARD, 3, size.x, size.y, this);
 		
 		background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
 		ricepack = BitmapFactory.decodeResource(getResources(), R.drawable.ricepack);
@@ -54,6 +52,8 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 		moussaka=Bitmap.createScaledBitmap(moussaka, ricepack.getHeight(), ricepack.getWidth(), true);
 		life=Bitmap.createScaledBitmap(life, life.getWidth()/4, life.getHeight()/4, true);
 		lifeLost=Bitmap.createScaledBitmap(lifeLost, lifeLost.getWidth()/4, lifeLost.getHeight()/4, true);
+		
+		engine = new GameEngine(Mode.HARD, 3, size.x, size.y, this, ricepack.getWidth()/2);
 		
 		//Ninja
 		ninja=MediaPlayer.create(activity,R.raw.ninja);
@@ -206,7 +206,7 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			
 			xup = (int)event.getX();
 			yup = (int)event.getY();
-			combo = engine.setUpPosition(xup, yup, dec, combo);
+			combo = engine.setUpPosition(xup, yup, combo);
 			if(combo>0)
 			{
 				Log.e("ninja","ninja");
@@ -228,7 +228,7 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			
 			xup = (int)event.getX();
 			yup = (int)event.getY();
-			combo = engine.setUpPosition(xup, yup, dec, combo);
+			combo = engine.setUpPosition(xup, yup, combo);
 			if(combo>0)
 			{
 				Log.e("ninja","ninja");
