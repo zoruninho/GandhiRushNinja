@@ -26,6 +26,19 @@ public enum Mode {
 		stepRate = step;
 	}
 	
+	public static Mode getMode(int i){
+		switch(i){
+		case 1:
+			return Mode.EASY;
+		case 2:
+			return Mode.NORMAL;
+		case 3:
+			return Mode.HARD;
+		default:
+			return Mode.PEACE;
+		}
+	}
+	
 	public float getRiceRate(){
 		return riceRate;
 	}

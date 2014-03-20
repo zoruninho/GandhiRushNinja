@@ -58,8 +58,10 @@ public class GameEngine extends Thread {
 				pack.add(packrice);				
 				time = bufftime;
 			}
-			if(buffscore+10 < score)
+			if(buffscore+10 < score){
 				mode.increment();
+				buffscore = score;
+			}
 			view.refreshDisplay();
 		}
 
@@ -112,6 +114,7 @@ public class GameEngine extends Thread {
 					decreaseLife();
 				else{
 					score+=++combo;
+					view.packKilled(pos[i][0], pos[i][1]);
 				}
 				pack.remove(differs);
 			}

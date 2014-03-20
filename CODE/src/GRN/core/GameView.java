@@ -3,7 +3,9 @@ package GRN.core;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -22,7 +24,7 @@ import android.view.WindowManager;
 public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.Callback{
 
 	Bitmap background,ricepack, moussaka, life, lifeLost;
-	MediaPlayer ninja;
+	MediaPlayer ninja, lifeLostSound;
 	public GameEngine engine;
 	private SurfaceHolder holder;
 	Paint paint, scorePaint;
@@ -30,11 +32,16 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	int sizeY;
 	int x = 0, y = 0, xup = 0, yup = 0, combo = 0;
 	int xs = 0, ys = 0;
+	int lifeNumber;
 	ArrayList<PointLine> points;
 	boolean music=true;
+	GameActivity activity=null;
+
+	boolean alreadyStopped =false;
 	
 	public GameView(GameActivity activity, String difficulty) {
 		super(activity);
+		this.activity=activity;
 		WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
 		Point size = new Point();
@@ -53,10 +60,13 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 		life=Bitmap.createScaledBitmap(life, life.getWidth()/4, life.getHeight()/4, true);
 		lifeLost=Bitmap.createScaledBitmap(lifeLost, lifeLost.getWidth()/4, lifeLost.getHeight()/4, true);
 		
-		engine = new GameEngine(Mode.HARD, 3, size.x, size.y, this, ricepack.getWidth()/2);
+		engine = new GameEngine(Mode.getMode(Integer.parseInt(difficulty)), 3, size.x, size.y, this, ricepack.getWidth()/2);
+		lifeNumber=3;
 		
 		//Ninja
 		ninja=MediaPlayer.create(activity,R.raw.ninja);
+		//ninja.setVolume(500, 500);
+		lifeLostSound=MediaPlayer.create(activity,R.raw.lifeleft);
 		
   	  	holder = getHolder();
 
@@ -117,6 +127,11 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			{
 				canvas.drawBitmap(lifeLost, (sizeX/15)+80*i, sizeY/15, null);
 			}
+		}
+		if(lifeNumber>engine.getLife())
+		{
+			lifeLostSound.start();
+			lifeNumber=engine.getLife();
 		}
 		
 		int dec = ricepack.getWidth()/2;
@@ -209,7 +224,10 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			combo = engine.setUpPosition(xup, yup, combo);
 			if(combo>0)
 			{
-				Log.e("ninja","ninja");
+				if(ninja.isPlaying() && combo>1)
+				{
+					ninja.seekTo(0);
+				}
 				ninja.start();
 			}
 			
@@ -231,7 +249,10 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			combo = engine.setUpPosition(xup, yup, combo);
 			if(combo>0)
 			{
-				Log.e("ninja","ninja");
+				if(ninja.isPlaying() && combo>1)
+				{
+					ninja.seekTo(0);
+				}
 				ninja.start();
 			}
 			
@@ -280,9 +301,81 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 
 	@Override
 	public void gameOver(int score) {
-		// TODO Auto-generated method stub
 		Canvas canvas;
 		canvas = null;
-		canvas.drawText("GAMEOVER OVER", sizeX/2, sizeY/2, null);
+		canvas.drawText("GAMEOVER OVER", sizeX/2, sizeY/2, null);/*
+		AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
+		builder.setCancelable(false)
+		.setMessage("Bravo, vous avez gagné !")
+		.setTitle("Champion ! Le roi des Zörglubienotchs est mort grâce à vous !")
+		.setNeutralButton("Recommencer", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// L'utilisateur peut recommencer s'il le veut
+				//mEngine.reset();
+				//mEngine.resume();
+			}*/
+	}
+	
+	public void pause()
+	{
+		engine.onPause();
+	}
+	
+	public void resume()
+	{
+		engine.onResume();
+	}
+
+	@Override
+	public void packKilled(int x, int y) {
+	
+	}
+	
+	public void reload(GameActivity activity, String difficulty, GameEngine engine)
+	{
+		this.activity=activity;
+		WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		sizeX=size.x;
+		sizeY=size.y;
+		
+		background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
+		ricepack = BitmapFactory.decodeResource(getResources(), R.drawable.ricepack);
+		moussaka = BitmapFactory.decodeResource(getResources(), R.drawable.moussaka);
+		life = BitmapFactory.decodeResource(getResources(), R.drawable.vie_indien);
+		lifeLost = BitmapFactory.decodeResource(getResources(), R.drawable.vie_perdue);
+		
+		background=Bitmap.createScaledBitmap(background, size.x, size.y, true);
+		moussaka=Bitmap.createScaledBitmap(moussaka, ricepack.getHeight(), ricepack.getWidth(), true);
+		life=Bitmap.createScaledBitmap(life, life.getWidth()/4, life.getHeight()/4, true);
+		lifeLost=Bitmap.createScaledBitmap(lifeLost, lifeLost.getWidth()/4, lifeLost.getHeight()/4, true);
+		
+		this.engine = engine;
+		lifeNumber=3;
+		
+		//Ninja
+		ninja=MediaPlayer.create(activity,R.raw.ninja);
+		//ninja.setVolume(500, 500);
+		lifeLostSound=MediaPlayer.create(activity,R.raw.lifeleft);
+		
+  	  	holder = getHolder();
+
+        holder.addCallback(this); 
+        
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(4);
+        paint.setColor(Color.WHITE);
+        
+        scorePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        scorePaint.setStyle(Paint.Style.STROKE);
+        scorePaint.setStrokeWidth(2);
+        scorePaint.setTextSize(20);
+        scorePaint.setColor(Color.WHITE);
+        
+        points = new ArrayList<PointLine>();
 	}
 }

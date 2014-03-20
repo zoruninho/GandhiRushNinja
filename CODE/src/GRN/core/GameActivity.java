@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 
 public class GameActivity extends Activity{
 		// Identifiant de la boîte de dialogue de victoire
@@ -15,9 +16,12 @@ public class GameActivity extends Activity{
 		public static final int DEFEAT_DIALOG = 1;
 	
 		MediaPlayer tunak;
+		String difficulty;
 		
 		// Le moteur physique du jeu
 		private GameView mView = null;
+		
+		private GameEngine engine = null;
 
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
@@ -25,23 +29,29 @@ public class GameActivity extends Activity{
 			Intent intent = getIntent();
 			Bundle extras = intent.getExtras();  
 
-			mView = new GameView(this, extras.get("difficulty").toString());
+			mView = new GameView(this, difficulty=extras.get("difficulty").toString());
 			setContentView(mView);
 			
+			this.engine=mView.engine;
 			tunak = MediaPlayer.create(this, R.raw.tunak);
+			tunak.setVolume(0.4f,0.4f);
 			tunak.start();
 		}
 
-		/*protected void onResume() {
+		protected void onResume() {
 			super.onResume();
-			mEngine.resume();
+			Log.e("resume","resume");
+			mView.reload(this, difficulty, engine);
+			mView.resume();
 		} 
 
 		@Override
 		protected void onPause() {
 			super.onStop();
-			mEngine.stop();
-		}*/
+			Log.e("stop","stop");
+			engine=mView.engine;
+			mView.pause();
+		}
 
 		@Override
 		public Dialog onCreateDialog (int id) {
