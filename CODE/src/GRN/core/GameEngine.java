@@ -145,7 +145,7 @@ public class GameEngine extends Thread {
 	}
 
 	private void gameOver() {
-		this.running = false;
+		//this.running = false;
 		view.gameOver(score);
 	}
 	

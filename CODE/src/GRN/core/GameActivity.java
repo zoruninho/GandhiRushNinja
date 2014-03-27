@@ -41,8 +41,9 @@ public class GameActivity extends Activity{
 		protected void onResume() {
 			super.onResume();
 			Log.e("resume","resume");
-			mView.reload(this, difficulty, engine);
+			mView = new GameView(this, difficulty, engine);
 			mView.resume();
+			tunak.start();
 		} 
 
 		@Override
@@ -50,7 +51,9 @@ public class GameActivity extends Activity{
 			super.onStop();
 			Log.e("stop","stop");
 			engine=mView.engine;
+			tunak.pause();
 			mView.pause();
+			mView.recycleAll();
 		}
 
 		@Override
@@ -72,14 +75,16 @@ public class GameActivity extends Activity{
 				break;
 
 			case DEFEAT_DIALOG:
+				tunak.pause();
+				mView.pause();
+				mView.recycleAll();
 				builder.setCancelable(false)
-				.setMessage("La Terre a été détruite à cause de vos erreurs.")
-				.setTitle("Bah bravo !")
+				.setMessage("Retentez votre chance ! Vous en ressortirez surement Gandhi !")
+				.setTitle("C'est la fin ...")
 				.setNeutralButton("Recommencer", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						//mEngine.reset();
-						//mEngine.resume();
+						reloadGame();
 					}
 				});
 			}
@@ -90,6 +95,17 @@ public class GameActivity extends Activity{
 		public void onPrepareDialog (int id, Dialog box) {
 			// A chaque fois qu'une boîte de dialogue est lancée, on arrête le moteur physique
 			//mEngine.stop();
+		}
+		
+		public void reloadGame()
+		{
+			mView = new GameView(this, difficulty);
+			setContentView(mView);
+			
+			this.engine=mView.engine;
+			tunak = MediaPlayer.create(this, R.raw.tunak);
+			tunak.setVolume(0.4f,0.4f);
+			tunak.start();
 		}
 	}
 

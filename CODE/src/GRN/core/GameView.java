@@ -1,5 +1,6 @@
 package GRN.core;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
@@ -10,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Movie;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
@@ -36,6 +38,10 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	ArrayList<PointLine> points;
 	boolean music=true;
 	GameActivity activity=null;
+	InputStream is;
+	Movie movie1;
+	private long mMovieStart;
+	int xGif, yGif;
 
 	boolean alreadyStopped =false;
 	
@@ -59,6 +65,9 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 		moussaka=Bitmap.createScaledBitmap(moussaka, ricepack.getHeight(), ricepack.getWidth(), true);
 		life=Bitmap.createScaledBitmap(life, life.getWidth()/4, life.getHeight()/4, true);
 		lifeLost=Bitmap.createScaledBitmap(lifeLost, lifeLost.getWidth()/4, lifeLost.getHeight()/4, true);
+		
+		is = activity.getResources().openRawResource(R.drawable.deadpack);
+		movie1 = Movie.decodeStream(is); 
 		
 		engine = new GameEngine(Mode.getMode(Integer.parseInt(difficulty)), 3, size.x, size.y, this, ricepack.getWidth()/2);
 		lifeNumber=3;
@@ -84,6 +93,9 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
         scorePaint.setColor(Color.WHITE);
         
         points = new ArrayList<PointLine>();
+        
+        xGif=-1;
+        yGif=-1;
 	}
 
 	@SuppressLint("WrongCall")
@@ -114,6 +126,28 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	  		}
 		}
 		canvas.drawBitmap(background, 0, 0, null);
+		
+		//GIF
+		
+		if(xGif!=-1)
+		{
+			long now = android.os.SystemClock.uptimeMillis();
+	        if (mMovieStart == 0) {   // first time
+	            mMovieStart = now;
+	        }
+	        if (movie1 != null) {
+	            int dur = movie1.duration();
+	            if (dur == 0) {
+	                dur = 1000;
+	            }
+	            int relTime = (int)((now - mMovieStart) % dur);
+	            movie1.setTime(relTime);
+	            movie1.draw(canvas, xGif, yGif);
+	            //invalidate();
+	        }
+		}
+
+		
 		canvas.drawText("YOUR SCORE : "+engine.getScore(), 4*sizeX/5, sizeY/4, scorePaint);
 		
 		//Les vies
@@ -224,6 +258,8 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			combo = engine.setUpPosition(xup, yup, combo);
 			if(combo>0)
 			{
+				xGif=xup;
+				yGif=yup;
 				if(ninja.isPlaying() && combo>1)
 				{
 					ninja.seekTo(0);
@@ -249,6 +285,8 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			combo = engine.setUpPosition(xup, yup, combo);
 			if(combo>0)
 			{
+				xGif=xup;
+				yGif=yup;
 				if(ninja.isPlaying() && combo>1)
 				{
 					ninja.seekTo(0);
@@ -301,20 +339,7 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 
 	@Override
 	public void gameOver(int score) {
-		Canvas canvas;
-		canvas = null;
-		canvas.drawText("GAMEOVER OVER", sizeX/2, sizeY/2, null);/*
-		AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
-		builder.setCancelable(false)
-		.setMessage("Bravo, vous avez gagné !")
-		.setTitle("Champion ! Le roi des Zörglubienotchs est mort grâce à vous !")
-		.setNeutralButton("Recommencer", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				// L'utilisateur peut recommencer s'il le veut
-				//mEngine.reset();
-				//mEngine.resume();
-			}*/
+		activity.showDialog(GameActivity.DEFEAT_DIALOG);
 	}
 	
 	public void pause()
@@ -332,8 +357,9 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	
 	}
 	
-	public void reload(GameActivity activity, String difficulty, GameEngine engine)
+	public GameView(GameActivity activity, String difficulty, GameEngine engine)
 	{
+		super(activity);
 		this.activity=activity;
 		WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
@@ -342,11 +368,16 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 		sizeX=size.x;
 		sizeY=size.y;
 		
-		background = BitmapFactory.decodeResource(getResources(), R.drawable.background);
-		ricepack = BitmapFactory.decodeResource(getResources(), R.drawable.ricepack);
-		moussaka = BitmapFactory.decodeResource(getResources(), R.drawable.moussaka);
-		life = BitmapFactory.decodeResource(getResources(), R.drawable.vie_indien);
-		lifeLost = BitmapFactory.decodeResource(getResources(), R.drawable.vie_perdue);
+		BitmapFactory.Options o=new BitmapFactory.Options();
+		o.inSampleSize = 4;
+		o.inDither=false;                     //Disable Dithering mode
+		o.inPurgeable=true; 
+		
+		background = BitmapFactory.decodeResource(getResources(), R.drawable.background,o);
+		ricepack = BitmapFactory.decodeResource(getResources(), R.drawable.ricepack,o);
+		moussaka = BitmapFactory.decodeResource(getResources(), R.drawable.moussaka,o);
+		life = BitmapFactory.decodeResource(getResources(), R.drawable.vie_indien,o);
+		lifeLost = BitmapFactory.decodeResource(getResources(), R.drawable.vie_perdue,o);
 		
 		background=Bitmap.createScaledBitmap(background, size.x, size.y, true);
 		moussaka=Bitmap.createScaledBitmap(moussaka, ricepack.getHeight(), ricepack.getWidth(), true);
@@ -377,5 +408,23 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
         scorePaint.setColor(Color.WHITE);
         
         points = new ArrayList<PointLine>();
+	}
+	
+	public void recycleAll()
+	{
+		this.background.recycle();
+		this.background=null;
+		
+		this.ricepack.recycle();
+		this.ricepack=null;
+		
+		this.moussaka.recycle();
+		this.moussaka=null;
+		
+		this.life.recycle();
+		this.life=null;
+		
+		this.lifeLost.recycle();
+		this.lifeLost=null;
 	}
 }
