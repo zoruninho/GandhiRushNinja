@@ -1,9 +1,52 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/gandhi_wallpaper_menu"
+    android:gravity="center_vertical"
+    android:orientation="vertical" >
 
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <ImageButton
+            android:id="@+id/bSon"
+            android:layout_width="50pt"
+            android:layout_height="22pt"
+            android:src="@drawable/son" />
+        <ImageButton
+            android:id="@+id/bMusic"
+            android:layout_width="50pt"
+            android:layout_height="22pt"
+            android:src="@drawable/musique" />
+    </LinearLayout>
 
-</menu>
+    <Button
+        android:id="@+id/bNew"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:background="@color/OrangeIndianFlag"
+        android:padding="5pt"
+        android:text="@string/btn_newgame"
+        android:textSize="22pt" />
+    <Button
+        android:id="@+id/bHighScore"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:background="@color/White"
+        android:padding="5pt"
+        android:text="@string/btn_HighScore"
+        android:textSize="22pt" />
+    <Button
+        android:id="@+id/bExit"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:background="@color/GreenIndianFlag"
+        android:padding="5pt"
+        android:text="@string/btn_exit"
+        android:textSize="22pt" />
+
+</LinearLayout>

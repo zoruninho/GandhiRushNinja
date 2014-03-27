@@ -8,28 +8,19 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
-        android:layout_marginTop="-40dp" >
+        android:layout_height="wrap_content" >
+
+        <ImageButton
+            android:id="@+id/bSon"
+            android:layout_width="50pt"
+            android:layout_height="22pt"
+            android:src="@drawable/son" />
 
         <ImageButton
             android:id="@+id/bMusic"
-            android:layout_width="40pt"
-            android:layout_height="40pt"
-            android:adjustViewBounds="true"
-            android:background="@null"
-            android:scaleType="fitCenter"
+            android:layout_width="50pt"
+            android:layout_height="22pt"
             android:src="@drawable/musique" />
-        
-        <ImageButton
-            android:id="@+id/bSon"
-            android:layout_width="40pt"
-            android:layout_height="40pt"
-            android:adjustViewBounds="true"
-            android:background="@null"
-            android:scaleType="fitCenter"
-            android:src="@drawable/son"
-            android:layout_marginLeft="20dp" />
     </LinearLayout>
 
     <Button
@@ -41,6 +32,7 @@
         android:padding="5pt"
         android:text="@string/btn_newgame"
         android:textSize="22pt" />
+
     <Button
         android:id="@+id/bHighScore"
         android:layout_width="fill_parent"
@@ -50,6 +42,7 @@
         android:padding="5pt"
         android:text="@string/btn_HighScore"
         android:textSize="22pt" />
+
     <Button
         android:id="@+id/bExit"
         android:layout_width="fill_parent"

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/background_light"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:background="@color/WhiteSmoke"
+        android:alpha="0.75"
+        android:orientation="vertical" >
+
+       
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/titlePopupHS" 
+                android:textColor="@color/OrangeIndianFlag"
+                android:textStyle="bold|normal"
+                android:textSize="30sp"/>
+
+            <ScrollView
+                android:id="@+id/scrollView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbarTrackVertical="@color/GreenIndianFlag" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
+
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
+
+                        <TableRow
+                            android:id="@+id/tableRow1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <RatingBar
+                                android:id="@+id/ratingBar1"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content" 
+                                android:numStars="5"
+                                android:rating="3"
+                               
+                                />
+                        </TableRow>
+                           <TableRow
+                            android:id="@+id/tableRow1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <RatingBar
+                                android:id="@+id/ratingBar1"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content" 
+                                android:numStars="5"
+                                android:rating="3"
+                               
+                                />
+                        </TableRow>
+                             
+                              <TableRow
+                            android:id="@+id/tableRow1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <RatingBar
+                                android:id="@+id/ratingBar1"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content" 
+                                android:numStars="5"
+                                android:rating="3"
+                               
+                                />
+                        </TableRow>
+                             
+                                 <TableRow
+                            android:id="@+id/tableRow1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                                     <RatingBar
+                                         android:id="@+id/ratingBar1"
+                                         android:layout_width="fill_parent"
+                                         android:layout_height="wrap_content"
+                                         android:numStars="5"
+                                         android:rating="3" />
+
+                        </TableRow>
+                             
+                                    <TableRow
+                            android:id="@+id/tableRow1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <RatingBar
+                                android:id="@+id/ratingBar1"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content" 
+                                android:numStars="5"
+                                android:rating="3"
+                               
+                                />
+                        </TableRow>
+                             
+                                       <TableRow
+                            android:id="@+id/tableRow1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <RatingBar
+                                android:id="@+id/ratingBar1"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content" 
+                                android:numStars="5"
+                                android:rating="3"
+                               
+                                />
+                        </TableRow>
+                             
+                                          <TableRow
+                            android:id="@+id/tableRow1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <RatingBar
+                                android:id="@+id/ratingBar1"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content" 
+                                android:numStars="5"
+                                android:rating="3"
+                               
+                                />
+                        </TableRow>
+                             
+                                             <TableRow
+                            android:id="@+id/tableRow1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <RatingBar
+                                android:id="@+id/ratingBar1"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content" 
+                                android:numStars="5"
+                                android:rating="3"
+                               
+                                />
+                        </TableRow>
+                             
+                                                <TableRow
+                            android:id="@+id/tableRow1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <RatingBar
+                                android:id="@+id/ratingBar1"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content" 
+                                android:numStars="5"
+                                android:rating="3"
+                               
+                                />
+                        </TableRow>
+                             
+                                                   <TableRow
+                            android:id="@+id/tableRow1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <RatingBar
+                                android:id="@+id/ratingBar1"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content" 
+                                android:numStars="5"
+                                android:rating="3"
+                               
+                                />
+                        </TableRow>
+                             
+                                                      <TableRow
+                            android:id="@+id/tableRow1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" >
+
+                            <RatingBar
+                                android:id="@+id/ratingBar1"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content" 
+                                android:numStars="5"
+                                android:rating="3"
+                               
+                                />
+                        </TableRow>
+                             
+                             
+                    </TableLayout>
+
+                    <Button
+                        android:id="@+id/dismiss"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:text="quitter" 
+                        android:background="@color/Red"
+                        android:alpha="0.8"/>
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+
+</LinearLayout>

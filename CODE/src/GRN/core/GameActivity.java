@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 public class GameActivity extends Activity{
@@ -17,7 +19,10 @@ public class GameActivity extends Activity{
 	
 		MediaPlayer tunak;
 		String difficulty;
+		Handler handler;
+		Activity THIS = this;
 		
+		boolean musicActivated=false, soundsActivated=false;
 		// Le moteur physique du jeu
 		private GameView mView = null;
 		
@@ -29,13 +34,20 @@ public class GameActivity extends Activity{
 			Intent intent = getIntent();
 			Bundle extras = intent.getExtras();  
 
-			mView = new GameView(this, difficulty=extras.get("difficulty").toString());
+			musicActivated=extras.getBoolean("musicActivated");
+			soundsActivated=extras.getBoolean("soundsActivated");
+			
+			mView = new GameView(this, difficulty=extras.get("difficulty").toString(),soundsActivated);
 			setContentView(mView);
 			
 			this.engine=mView.engine;
-			tunak = MediaPlayer.create(this, R.raw.tunak);
-			tunak.setVolume(0.4f,0.4f);
-			tunak.start();
+			
+			if(musicActivated)
+			{
+				tunak = MediaPlayer.create(this, R.raw.tunak);
+				tunak.setVolume(0.4f,0.4f);
+				tunak.start();
+			}
 		}
 
 		protected void onResume() {
@@ -43,7 +55,10 @@ public class GameActivity extends Activity{
 			Log.e("resume","resume");
 			mView = new GameView(this, difficulty, engine);
 			mView.resume();
-			tunak.start();
+			if(musicActivated)
+			{
+				tunak.start();
+			}
 		} 
 
 		@Override
@@ -51,7 +66,12 @@ public class GameActivity extends Activity{
 			super.onStop();
 			Log.e("stop","stop");
 			engine=mView.engine;
+			
+			if(musicActivated)
+			{
 			tunak.pause();
+			}
+			
 			mView.pause();
 			mView.recycleAll();
 		}
@@ -59,26 +79,18 @@ public class GameActivity extends Activity{
 		@Override
 		public Dialog onCreateDialog (int id) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			Log.e("gameoverActivity","gameoverActivity");
 			switch(id) {
-			case VICTORY_DIALOG:
-				builder.setCancelable(false)
-				.setMessage("Bravo, vous avez gagné !")
-				.setTitle("Champion ! Le roi des Zörglubienotchs est mort grâce à vous !")
-				.setNeutralButton("Recommencer", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// L'utilisateur peut recommencer s'il le veut
-						//mEngine.reset();
-						//mEngine.resume();
-					}
-				});
-				break;
 
 			case DEFEAT_DIALOG:
-				tunak.pause();
+				Log.e("gameoverActivityDIALOG","gameoverActivityDIALOG");
+				if(musicActivated)
+				{
+					tunak.pause();
+				}
 				mView.pause();
 				mView.recycleAll();
-				builder.setCancelable(false)
+            	builder.setCancelable(false)
 				.setMessage("Retentez votre chance ! Vous en ressortirez surement Gandhi !")
 				.setTitle("C'est la fin ...")
 				.setNeutralButton("Recommencer", new DialogInterface.OnClickListener() {
@@ -87,8 +99,17 @@ public class GameActivity extends Activity{
 						reloadGame();
 					}
 				});
-			}
-			return builder.create();
+            	Log.e("gameoverActivityDIALOG2","gameoverActivityDIALOG2");
+            break;
+		    }
+			Looper.prepare();
+			Log.e("gameoverActivityEND","gameoverActivityEND");
+			Dialog dialog = builder.create();
+			dialog.show();
+
+			Looper.loop();
+			Looper.myLooper().quit();
+			return  dialog;
 		}
 
 		@Override
@@ -99,7 +120,7 @@ public class GameActivity extends Activity{
 		
 		public void reloadGame()
 		{
-			mView = new GameView(this, difficulty);
+			mView = new GameView(this, difficulty, soundsActivated);
 			setContentView(mView);
 			
 			this.engine=mView.engine;

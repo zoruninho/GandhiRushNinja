@@ -43,9 +43,9 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	private long mMovieStart;
 	int xGif, yGif;
 
-	boolean alreadyStopped =false;
+	boolean alreadyStopped =false, soundsActivated;
 	
-	public GameView(GameActivity activity, String difficulty) {
+	public GameView(GameActivity activity, String difficulty, boolean soundsActivated) {
 		super(activity);
 		this.activity=activity;
 		WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
@@ -72,10 +72,14 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 		engine = new GameEngine(Mode.getMode(Integer.parseInt(difficulty)), 3, size.x, size.y, this, ricepack.getWidth()/2);
 		lifeNumber=3;
 		
-		//Ninja
+		//Musiques 
+
+		this.soundsActivated=soundsActivated;
+		if(soundsActivated)
+		{
 		ninja=MediaPlayer.create(activity,R.raw.ninja);
-		//ninja.setVolume(500, 500);
 		lifeLostSound=MediaPlayer.create(activity,R.raw.lifeleft);
+		}
 		
   	  	holder = getHolder();
 
@@ -142,7 +146,7 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	            }
 	            int relTime = (int)((now - mMovieStart) % dur);
 	            movie1.setTime(relTime);
-	            movie1.draw(canvas, xGif, yGif);
+	            movie1.draw(canvas, xGif-(movie1.width()/2), yGif-(movie1.height()/2));
 	            //invalidate();
 	        }
 		}
@@ -164,7 +168,10 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 		}
 		if(lifeNumber>engine.getLife())
 		{
-			lifeLostSound.start();
+			if(soundsActivated)
+			{
+				lifeLostSound.start();
+			}
 			lifeNumber=engine.getLife();
 		}
 		
@@ -258,13 +265,14 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			combo = engine.setUpPosition(xup, yup, combo);
 			if(combo>0)
 			{
-				xGif=xup;
-				yGif=yup;
-				if(ninja.isPlaying() && combo>1)
+				if(soundsActivated)
 				{
-					ninja.seekTo(0);
+					if(ninja.isPlaying() && combo>1)
+					{
+						ninja.seekTo(0);
+					}
+					ninja.start();
 				}
-				ninja.start();
 			}
 			
 			PointLine point = new PointLine();
@@ -285,13 +293,14 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 			combo = engine.setUpPosition(xup, yup, combo);
 			if(combo>0)
 			{
-				xGif=xup;
-				yGif=yup;
-				if(ninja.isPlaying() && combo>1)
+				if(soundsActivated)
 				{
-					ninja.seekTo(0);
+					if(ninja.isPlaying() && combo>1)
+					{
+						ninja.seekTo(0);
+					}
+					ninja.start();
 				}
-				ninja.start();
 			}
 			
 	  		if(points.size()>10)
@@ -339,6 +348,7 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 
 	@Override
 	public void gameOver(int score) {
+		Log.e("gameoverView","gameoverView");
 		activity.showDialog(GameActivity.DEFEAT_DIALOG);
 	}
 	
@@ -354,7 +364,8 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 
 	@Override
 	public void packKilled(int x, int y) {
-	
+		xGif=x;
+		yGif=y;
 	}
 	
 	public GameView(GameActivity activity, String difficulty, GameEngine engine)
@@ -387,10 +398,11 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 		this.engine = engine;
 		lifeNumber=3;
 		
-		//Ninja
-		ninja=MediaPlayer.create(activity,R.raw.ninja);
-		//ninja.setVolume(500, 500);
-		lifeLostSound=MediaPlayer.create(activity,R.raw.lifeleft);
+		if(soundsActivated)
+		{
+			ninja=MediaPlayer.create(activity,R.raw.ninja);
+			lifeLostSound=MediaPlayer.create(activity,R.raw.lifeleft);
+		}
 		
   	  	holder = getHolder();
 
