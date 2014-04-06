@@ -349,6 +349,7 @@ public class GameView extends SurfaceView implements GameDisplay, SurfaceHolder.
 	@Override
 	public void gameOver(int score) {
 		Log.e("gameoverView","gameoverView");
+		activity.storeScore(score);
 		activity.showDialog(GameActivity.DEFEAT_DIALOG);
 	}
 	

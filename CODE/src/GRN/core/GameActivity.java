@@ -3,8 +3,11 @@ package GRN.core;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,6 +33,9 @@ public class GameActivity extends Activity{
 
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
+			SharedPreferences prefs = this.getSharedPreferences("myPrefsKey", Context.MODE_PRIVATE);
+			int score = prefs.getInt("highscore", 0); //0 is the default value
+			Log.e("score","score :"+score);
 			super.onCreate(savedInstanceState);
 			Intent intent = getIntent();
 			Bundle extras = intent.getExtras();  
@@ -127,6 +133,14 @@ public class GameActivity extends Activity{
 			tunak = MediaPlayer.create(this, R.raw.tunak);
 			tunak.setVolume(0.4f,0.4f);
 			tunak.start();
+		}
+		
+		public void storeScore(int score)
+		{
+			SharedPreferences prefs = this.getSharedPreferences("myPrefsKey", Context.MODE_PRIVATE);
+			Editor editor = prefs.edit();
+			editor.putInt("highscore", score);
+			editor.commit();
 		}
 	}
 
